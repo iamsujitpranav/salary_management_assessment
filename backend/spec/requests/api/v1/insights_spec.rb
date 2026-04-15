@@ -29,7 +29,26 @@ RSpec.describe "Api::V1::Insights", type: :request do
     get "/api/v1/insights/by_country"
 
     expect(response).to have_http_status(:ok)
-    expect(JSON.parse(response.body)["countries"].size).to eq(2)
+    expect(JSON.parse(response.body)["countries"].map { |row| [row["country"], row["job_title"]] }).to contain_exactly(
+      ["India", "HR Manager"],
+      ["India", "Senior Engineer"],
+      ["United States", "Product Manager"]
+    )
+  end
+
+  it "returns by country metrics filtered by job title" do
+    get "/api/v1/insights/by_country", params: { job_title: "Engineer" }
+
+    expect(response).to have_http_status(:ok)
+    body = JSON.parse(response.body)
+    expect(body["countries"].map { |row| row["job_title"] }).to include("Senior Engineer")
+  end
+
+  it "returns no country metrics when the job title does not match" do
+    get "/api/v1/insights/by_country", params: { job_title: "Architect" }
+
+    expect(response).to have_http_status(:ok)
+    expect(JSON.parse(response.body)["countries"]).to eq([])
   end
 
   it "returns by job title metrics" do
@@ -47,6 +66,13 @@ RSpec.describe "Api::V1::Insights", type: :request do
     body = JSON.parse(response.body)
     expect(body["job_titles"].size).to eq(1)
     expect(body["job_titles"].first["job_title"]).to eq("Senior Engineer")
+  end
+
+  it "returns no job title metrics when the search matches nothing" do
+    get "/api/v1/insights/by_job_title", params: { country: "India", job_title: "Architect" }
+
+    expect(response).to have_http_status(:ok)
+    expect(JSON.parse(response.body)["job_titles"]).to eq([])
   end
 
   it "serves the generated openapi document" do

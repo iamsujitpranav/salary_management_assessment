@@ -36,7 +36,31 @@ RSpec.describe EmployeeInsightService do
     it "returns aggregated metrics per country" do
       countries = described_class.by_country
 
-      expect(countries.map { |row| row[:country] }).to contain_exactly("India", "United States")
+      expect(countries.map { |row| [row[:country], row[:job_title]] }).to contain_exactly(
+        ["India", "HR Manager"],
+        ["India", "Senior Engineer"],
+        ["United States", "Product Manager"]
+      )
+    end
+
+    it "filters by job title" do
+      countries = described_class.by_country(job_title: "Senior Engineer")
+
+      expect(countries.size).to eq(1)
+      expect(countries.first[:country]).to eq("India")
+      expect(countries.first[:job_title]).to eq("Senior Engineer")
+    end
+
+    it "supports partial job title searches" do
+      countries = described_class.by_country(job_title: "Engineer")
+
+      expect(countries.map { |row| row[:job_title] }).to include("Senior Engineer")
+    end
+
+    it "returns no rows when the job title search matches nothing" do
+      countries = described_class.by_country(job_title: "Architect")
+
+      expect(countries).to be_empty
     end
   end
 
@@ -44,7 +68,7 @@ RSpec.describe EmployeeInsightService do
     it "returns aggregated metrics per title" do
       titles = described_class.by_job_title(country: "India")
 
-      expect(titles.map { |row| row[:job_title] }).to contain_exactly("HR Manager", "Senior Engineer")
+      expect(titles.map { |row| [row[:job_title], row[:country]] }).to contain_exactly(["HR Manager", "India"], ["Senior Engineer", "India"])
     end
 
     it "filters by country and job title" do
@@ -52,7 +76,14 @@ RSpec.describe EmployeeInsightService do
 
       expect(titles.size).to eq(1)
       expect(titles.first[:job_title]).to eq("Senior Engineer")
+      expect(titles.first[:country]).to eq("India")
       expect(titles.first[:headcount]).to eq(1)
+    end
+
+    it "returns no rows when the job title search matches nothing" do
+      titles = described_class.by_job_title(country: "India", job_title: "Architect")
+
+      expect(titles).to be_empty
     end
 
     it "returns an empty overview when there are no employees" do

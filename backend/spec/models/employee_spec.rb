@@ -3,6 +3,11 @@ require "rails_helper"
 RSpec.describe Employee, type: :model do
   subject(:employee) { build(:employee) }
 
+  before do
+    SalaryHistory.delete_all
+    Employee.delete_all
+  end
+
   it { is_expected.to have_many(:salary_histories).dependent(:destroy) }
   it { is_expected.to validate_presence_of(:first_name) }
   it { is_expected.to validate_presence_of(:last_name) }
@@ -60,10 +65,31 @@ RSpec.describe Employee, type: :model do
     expect(employee.salary_in_base_currency).to eq(120_000)
   end
 
+  it "searches employees with the full-text scope" do
+    create(:employee, first_name: "Zara", last_name: "Quinn", job_title: "Architect")
+
+    expect(Employee.searching("Quinn").map(&:full_name)).to include("Zara Quinn")
+  end
+
   it "returns all employees when the country and job title filters are blank" do
     create(:employee, country: "Japan", job_title: "Analyst")
 
-    expect(Employee.in_country(nil).count).to be >= 2
-    expect(Employee.with_job_title(nil).count).to be >= 2
+    expect(Employee.in_country(nil).count).to eq(1)
+    expect(Employee.with_job_title(nil).count).to eq(1)
+  end
+
+  it "filters employees by status" do
+    create(:employee, status: "active")
+    create(:employee, status: "inactive", email: "inactive@example.com")
+
+    expect(Employee.with_status("inactive").map(&:status)).to contain_exactly("inactive")
+  end
+
+  it "supports partial job title matching" do
+    create(:employee, job_title: "Designer")
+    create(:employee, job_title: "Data Analyst", email: "data.analyst@example.com")
+
+    expect(Employee.with_job_title("des").map(&:job_title)).to include("Designer")
+    expect(Employee.with_job_title("data").map(&:job_title)).to include("Data Analyst")
   end
 end
