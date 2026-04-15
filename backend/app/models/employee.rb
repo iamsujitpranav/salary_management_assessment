@@ -13,11 +13,18 @@ class Employee < ApplicationRecord
   validates :status, inclusion: { in: STATUSES }
   validates :employment_type, inclusion: { in: EMPLOYMENT_TYPES }
 
-  # Full-text search uses the generated tsvector column so the search stays indexed.
+  # Partial text search matches name, title, and department substrings for predictable root-page filtering.
+  # Each term is ANDed across the concatenated roster fields using case-insensitive LIKE.
   scope :searching, lambda { |query|
     return all if query.blank?
 
-    where("search_vector @@ websearch_to_tsquery('english', ?)", query)
+    terms = query.to_s.split(/\s+/).map(&:strip).reject(&:blank?)
+    searchable_fields = "LOWER(CONCAT_WS(' ', first_name, last_name, job_title, department))"
+
+    terms.reduce(all) do |relation, term|
+      pattern = "%#{ActiveRecord::Base.sanitize_sql_like(term.downcase)}%"
+      relation.where("#{searchable_fields} LIKE ?", pattern)
+    end
   }
 
   scope :in_country, lambda { |country|
