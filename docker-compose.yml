@@ -19,9 +19,9 @@ services:
       DATABASE_NAME: salary_dev
       DATABASE_NAME_TEST: salary_test
       RAILS_ENV: development
-      CORS_ORIGIN: http://localhost:5173
+      CORS_ORIGIN: http://localhost:4173
     ports:
-      - "3000:3000"
+      - "3001:3000"
     depends_on:
       - db
     volumes:
@@ -30,11 +30,8 @@ services:
   frontend:
     build:
       context: ./frontend
-    command: npm run dev -- --host 0.0.0.0
-    environment:
-      VITE_API_URL: http://localhost:3000
     ports:
-      - "5173:5173"
+      - "4173:80"
     depends_on:
       - backend
     volumes:

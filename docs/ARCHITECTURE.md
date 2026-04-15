@@ -40,11 +40,15 @@ Business logic is kept in service objects:
 
 This keeps controllers thin and makes unit testing straightforward.
 
+The backend code also uses concise inline comments in the controller, service, and model layers where they explain why a block exists, especially around search, pagination, and SQL aggregation.
+
 ## Frontend
 
 ### React + TypeScript + Vite
 
 The UI is implemented as a modern SPA with a fast build and strong type safety.
+
+The frontend is covered by Vitest and React Testing Library tests for the app shell, employee form, table, store, API helpers, and salary insight views.
 
 ### State management
 

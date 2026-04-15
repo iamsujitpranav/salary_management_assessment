@@ -24,8 +24,8 @@ docker compose up --build
 
 The app exposes:
 
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:3000
+- Frontend: http://localhost:4173
+- Backend API: http://localhost:3001
 - Health check: `GET /health`
 
 ## Notes
