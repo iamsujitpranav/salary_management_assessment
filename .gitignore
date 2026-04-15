@@ -1,0 +1,26 @@
+# Ruby / Rails
+/backend/.bundle/
+/backend/vendor/bundle/
+/backend/tmp/
+/backend/log/
+/backend/storage/
+/backend/.byebug_history
+/backend/.ruby-version
+/backend/coverage/
+
+# Node / Vite
+/frontend/node_modules/
+/frontend/dist/
+/frontend/.vite/
+/frontend/coverage/
+/frontend/.env.local
+
+# Env files
+.env
+backend/.env
+frontend/.env
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
