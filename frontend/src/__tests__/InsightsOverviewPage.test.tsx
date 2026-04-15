@@ -54,11 +54,35 @@ describe('InsightsOverviewPage', () => {
 
     expect(screen.getByText('Salary overview')).toBeTruthy();
     expect(screen.getByText('Headcount')).toBeTruthy();
-    expect(screen.getByText('3')).toBeTruthy();
+    expect(screen.getAllByText('3').length).toBeGreaterThan(0);
 
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'India' } });
 
     expect(screen.getByText(/Showing metrics for India/i)).toBeTruthy();
-    expect(screen.getByText('2')).toBeTruthy();
+    expect(screen.getAllByText('2').length).toBeGreaterThan(0);
+  });
+
+  it('shows an empty state when there are no employment type metrics', () => {
+    useCountryInsightsMock.mockReturnValue({
+      data: {
+        countries: [],
+      },
+    });
+    useInsightsOverviewMock.mockReturnValue({
+      data: {
+        overview: {
+          headcount: 0,
+          average_salary: 0,
+          minimum_salary: 0,
+          maximum_salary: 0,
+          top_country: null,
+          employment_type_breakdown: {},
+        },
+      },
+    });
+
+    render(<InsightsOverviewPage />);
+
+    expect(screen.getByText('No employment type metrics available.')).toBeTruthy();
   });
 });

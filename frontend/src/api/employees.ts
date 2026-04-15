@@ -51,10 +51,10 @@ export async function fetchInsightsOverview(filters: Pick<InsightFilters, 'count
   return data;
 }
 
-export async function fetchCountryInsights(filters: Pick<InsightFilters, 'country'> = {}) {
-  const { country } = filters;
+export async function fetchCountryInsights(filters: Pick<InsightFilters, 'country' | 'job_title'> = {}) {
+  const { country, job_title } = filters;
   const { data } = await api.get<CountryInsightsResponse>('/api/v1/insights/by_country', {
-    params: country ? { country } : undefined,
+    params: country || job_title ? { ...(country ? { country } : {}), ...(job_title ? { job_title } : {}) } : undefined,
   });
 
   return data;

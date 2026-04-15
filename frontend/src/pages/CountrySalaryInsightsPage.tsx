@@ -4,8 +4,12 @@ import type { CountryInsight } from '../api/types';
 
 export function CountrySalaryInsightsPage() {
   const [country, setCountry] = useState('');
+  const [jobTitle, setJobTitle] = useState('');
   const allCountriesQuery = useCountryInsights();
-  const countryMetricsQuery = useCountryInsights(country ? { country } : {});
+  const countryMetricsQuery = useCountryInsights({
+    ...(country ? { country } : {}),
+    ...(jobTitle ? { job_title: jobTitle } : {}),
+  });
 
   const countryOptions = useMemo<string[]>(() => {
     const countries = (allCountriesQuery.data?.countries ?? []) as CountryInsight[];
@@ -49,6 +53,12 @@ export function CountrySalaryInsightsPage() {
           <span className="text-sm text-slate-300">
             {country ? `Showing salary metrics for ${country}` : 'Showing salary metrics for all countries'}
           </span>
+          <input
+            value={jobTitle}
+            onChange={(event) => setJobTitle(event.target.value)}
+            placeholder="Search by job title"
+            className="min-w-0 flex-1 rounded-2xl border border-slate-700 bg-slate-950/80 px-4 py-3 text-sm outline-none placeholder:text-slate-500 focus:border-cyan-400"
+          />
         </div>
       </div>
 
@@ -73,6 +83,7 @@ export function CountrySalaryInsightsPage() {
             <thead className="bg-slate-950/70 text-xs uppercase tracking-[0.2em] text-slate-300">
               <tr>
                 <th className="px-5 py-4">Country</th>
+                <th className="px-5 py-4">Job title</th>
                 <th className="px-5 py-4">Headcount</th>
                 <th className="px-5 py-4">Avg salary</th>
                 <th className="px-5 py-4">Min salary</th>
@@ -82,8 +93,9 @@ export function CountrySalaryInsightsPage() {
             </thead>
             <tbody>
               {rows.map((row) => (
-                <tr key={row.country} className="border-t border-slate-800/80 hover:bg-slate-950/60">
+                <tr key={`${row.country}-${row.job_title}`} className="border-t border-slate-800/80 hover:bg-slate-950/60">
                   <td className="px-5 py-4 font-medium text-white">{row.country}</td>
+                  <td className="px-5 py-4 text-slate-200">{row.job_title}</td>
                   <td className="px-5 py-4 text-slate-200">{row.headcount}</td>
                   <td className="px-5 py-4 text-cyan-200">${row.average_salary.toLocaleString()}</td>
                   <td className="px-5 py-4 text-emerald-200">${row.minimum_salary.toLocaleString()}</td>
@@ -93,7 +105,7 @@ export function CountrySalaryInsightsPage() {
               ))}
               {!rows.length ? (
                 <tr>
-                  <td className="px-5 py-8 text-slate-300" colSpan={6}>No country metrics available.</td>
+                  <td className="px-5 py-8 text-slate-300" colSpan={7}>No country metrics available.</td>
                 </tr>
               ) : null}
             </tbody>

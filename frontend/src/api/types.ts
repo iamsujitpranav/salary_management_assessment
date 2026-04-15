@@ -27,6 +27,7 @@ export type InsightOverview = {
 
 export type CountryInsight = {
   country: string;
+  job_title: string;
   headcount: number;
   average_salary: number;
   minimum_salary: number;
@@ -35,6 +36,7 @@ export type CountryInsight = {
 
 export type JobTitleInsight = {
   job_title: string;
+  country: string;
   headcount: number;
   average_salary: number;
 };

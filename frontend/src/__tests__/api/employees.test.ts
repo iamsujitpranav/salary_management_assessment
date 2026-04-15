@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { api } from '../../api/client';
-import { createEmployee, deleteEmployee, fetchEmployee, fetchEmployees, fetchInsights, updateEmployee } from '../../api/employees';
+import { createEmployee, deleteEmployee, fetchCountryInsights, fetchEmployee, fetchEmployees, fetchInsights, fetchJobTitleInsights, updateEmployee } from '../../api/employees';
 
 vi.mock('../../api/client', () => ({
   api: {
@@ -34,6 +34,26 @@ describe('employee api helpers', () => {
 
     expect(getMock).toHaveBeenCalledWith('/api/v1/employees/7');
     expect(result.employee.full_name).toBe('Maya Chen');
+  });
+
+  it('forwards both country and job title filters to country insights', async () => {
+    const getMock = vi.mocked(api.get);
+    getMock.mockResolvedValueOnce({ data: { countries: [] } } as never);
+
+    await fetchCountryInsights({ country: 'India', job_title: 'des' });
+
+    expect(getMock).toHaveBeenCalledWith('/api/v1/insights/by_country', {
+      params: { country: 'India', job_title: 'des' },
+    });
+  });
+
+  it('requests country insights without params when no filters are provided', async () => {
+    const getMock = vi.mocked(api.get);
+    getMock.mockResolvedValueOnce({ data: { countries: [] } } as never);
+
+    await fetchCountryInsights();
+
+    expect(getMock).toHaveBeenCalledWith('/api/v1/insights/by_country', { params: undefined });
   });
 
   it('forwards a large per_page value when requesting the full employee list', async () => {
@@ -70,6 +90,15 @@ describe('employee api helpers', () => {
     await fetchInsights({ country: 'Singapore', job_title: 'Engineer' });
 
     expect(getMock).toHaveBeenNthCalledWith(3, '/api/v1/insights/by_job_title', { params: { country: 'Singapore', job_title: 'Engineer' } });
+  });
+
+  it('requests job title insights without params when no filters are provided', async () => {
+    const getMock = vi.mocked(api.get);
+    getMock.mockResolvedValueOnce({ data: { job_titles: [] } } as never);
+
+    await fetchJobTitleInsights();
+
+    expect(getMock).toHaveBeenCalledWith('/api/v1/insights/by_job_title', { params: undefined });
   });
 
   it('submits employee create, update, and delete requests', async () => {

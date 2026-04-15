@@ -49,9 +49,9 @@ export function useInsightsOverview(filters: Pick<InsightFilters, 'country'> = {
   });
 }
 
-export function useCountryInsights(filters: Pick<InsightFilters, 'country'> = {}) {
+export function useCountryInsights(filters: Pick<InsightFilters, 'country' | 'job_title'> = {}) {
   return useQuery({
-    queryKey: ['insights-country', filters.country ?? 'all'],
+    queryKey: ['insights-country', filters.country ?? 'all', filters.job_title ?? 'all'],
     queryFn: () => fetchCountryInsights(filters),
   });
 }
