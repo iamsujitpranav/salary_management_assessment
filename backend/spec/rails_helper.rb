@@ -20,6 +20,9 @@ RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
   config.filter_rails_from_backtrace!
   config.include FactoryBot::Syntax::Methods
+  config.before(:each, type: :request) do
+    host! "localhost"
+  end
   config.after(:each, type: :request) do
     warn response.body if response&.status == 403
   end

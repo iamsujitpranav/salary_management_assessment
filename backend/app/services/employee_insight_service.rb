@@ -3,8 +3,8 @@ class EmployeeInsightService
     new(country:).overview
   end
 
-  def self.by_country(country: nil)
-    new(country:).by_country
+  def self.by_country(country: nil, job_title: nil)
+    new(country:, job_title:).by_country
   end
 
   def self.by_job_title(country: nil, job_title: nil)
@@ -32,17 +32,20 @@ class EmployeeInsightService
 
   def by_country
     scope = filtered_scope
+    scope = scope.with_job_title(job_title)
 
     # Grouping at the database layer keeps country-level rollups fast and predictable.
-    scope.group(:country).order(:country).pluck(
+    scope.group(:country, :job_title).order(:country, :job_title).pluck(
       :country,
+      :job_title,
       Arel.sql("COUNT(*)"),
       Arel.sql("AVG(salary)"),
       Arel.sql("MIN(salary)"),
       Arel.sql("MAX(salary)")
-    ).map do |country_name, count, average_salary, min_salary, max_salary|
+    ).map do |country_name, title, count, average_salary, min_salary, max_salary|
       {
         country: country_name,
+        job_title: title,
         headcount: count.to_i,
         average_salary: average_salary.to_f.round(2),
         minimum_salary: min_salary.to_f.round(2),
@@ -56,13 +59,15 @@ class EmployeeInsightService
     scope = scope.with_job_title(job_title)
 
     # Reuse the same filtered scope so title-based drill-downs match the country filter.
-    scope.group(:job_title).order(:job_title).pluck(
+    scope.group(:job_title, :country).order(:job_title, :country).pluck(
       :job_title,
+      :country,
       Arel.sql("COUNT(*)"),
       Arel.sql("AVG(salary)")
-    ).map do |title, count, average_salary|
+    ).map do |title, country_name, count, average_salary|
       {
         job_title: title,
+        country: country_name,
         headcount: count.to_i,
         average_salary: average_salary.to_f.round(2)
       }

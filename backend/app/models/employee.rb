@@ -29,8 +29,8 @@ class Employee < ApplicationRecord
   scope :with_job_title, lambda { |job_title|
     return all if job_title.blank?
 
-    normalized_job_title = job_title.to_s.strip.downcase
-    where('LOWER(TRIM(job_title)) = ?', normalized_job_title)
+    normalized_job_title = "%#{job_title.to_s.strip.downcase}%"
+    where('LOWER(TRIM(job_title)) LIKE ?', normalized_job_title)
   }
   scope :with_status, ->(status) { status.present? ? where(status:) : all }
 

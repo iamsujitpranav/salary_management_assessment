@@ -8,7 +8,7 @@ module Api
 
       def by_country
         # Country-level insight is still served through the same service entry point.
-        render json: { countries: EmployeeInsightService.by_country(country: params[:country]) }
+        render json: { countries: EmployeeInsightService.by_country(country: params[:country], job_title: params[:job_title]) }
       end
 
       def by_job_title
