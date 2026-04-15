@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::API
+  # Keep common API errors in one place so JSON responses stay predictable.
   rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
   rescue_from ActionController::ParameterMissing, with: :render_bad_request
 

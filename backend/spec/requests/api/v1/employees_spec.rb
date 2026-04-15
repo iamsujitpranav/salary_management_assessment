@@ -1,6 +1,11 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Employees", type: :request do
+  before do
+    SalaryHistory.delete_all
+    Employee.delete_all
+  end
+
   let!(:employee) { create(:employee) }
 
   describe "GET /api/v1/employees" do
@@ -36,6 +41,13 @@ RSpec.describe "Api::V1::Employees", type: :request do
       expect(response).to have_http_status(:created)
     end
 
+    it "returns bad request when the employee payload is missing" do
+      post "/api/v1/employees"
+
+      expect(response).to have_http_status(:bad_request)
+      expect(JSON.parse(response.body)["error"]).to include("param is missing")
+    end
+
     it "returns validation errors when required fields are missing" do
       post "/api/v1/employees", params: { employee: { first_name: "" } }
 
@@ -66,6 +78,13 @@ RSpec.describe "Api::V1::Employees", type: :request do
   end
 
   describe "GET /api/v1/employees/:id" do
+    it "returns an employee" do
+      get "/api/v1/employees/#{employee.id}"
+
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body)["employee"]["full_name"]).to eq(employee.full_name)
+    end
+
     it "returns not found for missing employees" do
       get "/api/v1/employees/999999"
 

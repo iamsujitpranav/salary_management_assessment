@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
   get "/health", to: "health#show"
+  get "/api-docs", to: redirect("/api-docs.html")
+  get "/openapi.json", to: "api/v1/docs#show"
 
   namespace :api do
     namespace :v1 do

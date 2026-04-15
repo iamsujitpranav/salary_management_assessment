@@ -1,35 +1,39 @@
 class EmployeeInsightService
-  def self.overview
-    new.overview
+  def self.overview(country: nil)
+    new(country:).overview
   end
 
-  def self.by_country
-    new.by_country
+  def self.by_country(country: nil)
+    new(country:).by_country
   end
 
-  def self.by_job_title(country: nil)
-    new(country:).by_job_title
+  def self.by_job_title(country: nil, job_title: nil)
+    new(country:, job_title:).by_job_title
   end
 
-  def initialize(country: nil)
+  def initialize(country: nil, job_title: nil)
     @country = country
+    @job_title = job_title
   end
 
   def overview
+    # This powers the dashboard summary cards and stays fully aggregated in SQL.
+    scope = filtered_scope
+
     {
-      headcount: Employee.count,
-      average_salary: Employee.average(:salary).to_f.round(2),
-      minimum_salary: Employee.minimum(:salary).to_f.round(2),
-      maximum_salary: Employee.maximum(:salary).to_f.round(2),
-      top_country: top_country,
-      employment_type_breakdown: employment_type_breakdown
+      headcount: scope.count,
+      average_salary: scope.average(:salary).to_f.round(2),
+      minimum_salary: scope.minimum(:salary).to_f.round(2),
+      maximum_salary: scope.maximum(:salary).to_f.round(2),
+      top_country: top_country(scope),
+      employment_type_breakdown: employment_type_breakdown(scope)
     }
   end
 
   def by_country
-    scope = Employee.all
-    scope = scope.where(country: country) if country.present?
+    scope = filtered_scope
 
+    # Grouping at the database layer keeps country-level rollups fast and predictable.
     scope.group(:country).order(:country).pluck(
       :country,
       Arel.sql("COUNT(*)"),
@@ -48,9 +52,10 @@ class EmployeeInsightService
   end
 
   def by_job_title
-    scope = Employee.all
-    scope = scope.where(country: country) if country.present?
+    scope = filtered_scope
+    scope = scope.with_job_title(job_title)
 
+    # Reuse the same filtered scope so title-based drill-downs match the country filter.
     scope.group(:job_title).order(:job_title).pluck(
       :job_title,
       Arel.sql("COUNT(*)"),
@@ -66,13 +71,21 @@ class EmployeeInsightService
 
   private
 
-  attr_reader :country
+  attr_reader :country, :job_title
 
-  def top_country
-    Employee.group(:country).order(Arel.sql("COUNT(*) DESC")).limit(1).pluck(:country).first
+  def filtered_scope
+    scope = Employee.all
+    scope = scope.in_country(country)
+    scope
   end
 
-  def employment_type_breakdown
-    Employee.group(:employment_type).order(:employment_type).count
+  def top_country(scope)
+    # The dashboard only needs the single highest-headcount country.
+    scope.group(:country).order(Arel.sql("COUNT(*) DESC")).limit(1).pluck(:country).first
+  end
+
+  def employment_type_breakdown(scope)
+    # This gives the UI a compact headcount split by employment type.
+    scope.group(:employment_type).order(:employment_type).count
   end
 end

@@ -18,11 +18,13 @@ class EmployeeSearchService
   end
 
   def call
+    # Keep the total count tied to the filtered relation so pagination metadata stays accurate.
     filtered = scope.searching(q)
                     .in_country(country)
                     .with_job_title(job_title)
                     .with_status(status)
 
+    # Use a stable order so the same query returns the same page boundaries.
     ordered = filtered.order(:last_name, :first_name, :id)
 
     Result.new(

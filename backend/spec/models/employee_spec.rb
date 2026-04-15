@@ -33,4 +33,37 @@ RSpec.describe Employee, type: :model do
 
     expect(employee.email).to eq("ava.patel@example.com")
   end
+
+  it "normalizes names, country, currency, and status" do
+    employee.first_name = "  maya  "
+    employee.last_name = "  chen  "
+    employee.job_title = "  product manager  "
+    employee.department = "  growth  "
+    employee.country = "  singapore  "
+    employee.currency = "  sgd  "
+    employee.employment_type = " part_time "
+    employee.status = " active "
+
+    employee.valid?
+
+    expect(employee.first_name).to eq("Maya")
+    expect(employee.last_name).to eq("Chen")
+    expect(employee.job_title).to eq("product manager")
+    expect(employee.department).to eq("growth")
+    expect(employee.country).to eq("Singapore")
+    expect(employee.currency).to eq("SGD")
+    expect(employee.employment_type).to eq("part_time")
+    expect(employee.status).to eq("active")
+  end
+
+  it "returns the salary in base currency" do
+    expect(employee.salary_in_base_currency).to eq(120_000)
+  end
+
+  it "returns all employees when the country and job title filters are blank" do
+    create(:employee, country: "Japan", job_title: "Analyst")
+
+    expect(Employee.in_country(nil).count).to be >= 2
+    expect(Employee.with_job_title(nil).count).to be >= 2
+  end
 end

@@ -4,6 +4,7 @@ module Api
       before_action :set_employee, only: %i[show update destroy]
 
       def index
+        # Search and pagination live in the service so this controller stays thin.
         result = EmployeeSearchService.call(
           page: params[:page],
           per_page: params[:per_page],
@@ -74,6 +75,7 @@ module Api
       end
 
       def employee_payload(employee)
+        # Shape the response once here so every endpoint returns the same fields.
         {
           id: employee.id,
           first_name: employee.first_name,
