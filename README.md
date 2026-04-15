@@ -16,7 +16,9 @@ A minimal yet usable salary management tool for HR managers, built with:
 
 ## Development
 
-Copy `.env.example` to `.env` and adjust values as needed.
+### Docker Setup (Recommended)
+
+The application is configured to run with Docker Compose. Simply run:
 
 ```bash
 docker compose up --build
@@ -27,6 +29,18 @@ The app exposes:
 - Frontend: http://localhost:4173
 - Backend API: http://localhost:3001
 - Health check: `GET /health`
+
+### Environment Configuration
+
+The Docker Compose setup includes all necessary environment variables. If you need to customize them:
+
+1. Copy `.env.example` to `.env`
+2. Adjust values as needed
+3. Restart the containers
+
+### Database Setup
+
+The database is automatically created and seeded when the backend container starts. The seed strategy is optimized for 10,000 employees using batched `insert_all` writes instead of row-by-row inserts.
 
 ## Notes
 

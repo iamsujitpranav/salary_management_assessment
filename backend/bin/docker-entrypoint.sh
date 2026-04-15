@@ -1,0 +1,23 @@
+#!/bin/bash
+set -e
+
+# Wait for database to be ready
+until PGPASSWORD=$DATABASE_PASSWORD psql -h "$DATABASE_HOST" -U "$DATABASE_USER" -d "postgres" -c '\q'; do
+  echo "PostgreSQL is unavailable - sleeping"
+  sleep 1
+done
+
+echo "PostgreSQL is up - executing command"
+
+# Run migrations
+echo "Running database migrations..."
+bundle exec rails db:migrate
+
+# Run seeds only in development environment
+if [ "$RAILS_ENV" = "development" ]; then
+  echo "Running database seeds..."
+  bundle exec rails db:seed
+fi
+
+# Execute the main command
+exec "$@"
