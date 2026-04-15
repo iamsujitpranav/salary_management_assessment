@@ -23,6 +23,15 @@ RSpec.describe EmployeeSearchService do
       expect(result.records.first.full_name).to eq("Zara Quinn")
     end
 
+    # Partial query test: ensures the service supports substring searches for predictable filtering.
+    # Validates that "strat" matches "Product Strategist" across the searchable roster fields.
+    it "matches partial query terms across searchable fields" do
+      result = described_class.call(q: "strat")
+
+      expect(result.total_count).to eq(1)
+      expect(result.records.first.full_name).to eq("Milo Stone")
+    end
+
     it "filters by country and job title" do
       result = described_class.call(country: "El Dorado", job_title: "Product Strategist")
 

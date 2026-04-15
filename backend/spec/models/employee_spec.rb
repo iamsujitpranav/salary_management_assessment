@@ -71,6 +71,14 @@ RSpec.describe Employee, type: :model do
     expect(Employee.searching("Quinn").map(&:full_name)).to include("Zara Quinn")
   end
 
+  # Partial matching test: ensures substring searches work across name, title, and department fields.
+  # This validates the root-page search behavior for terms like "des" matching "Designer".
+  it "matches partial terms in the searchable roster fields" do
+    create(:employee, first_name: "Maya", last_name: "Chen", job_title: "Designer", department: "Design")
+
+    expect(Employee.searching("des").map(&:full_name)).to include("Maya Chen")
+  end
+
   it "returns all employees when the country and job title filters are blank" do
     create(:employee, country: "Japan", job_title: "Analyst")
 
