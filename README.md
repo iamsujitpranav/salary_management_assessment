@@ -42,6 +42,20 @@ The Docker Compose setup includes all necessary environment variables. If you ne
 
 The database is automatically created and seeded when the backend container starts. The seed strategy is optimized for 10,000 employees using batched `insert_all` writes instead of row-by-row inserts.
 
+### Render.com Deployment
+
+For production deployment on Render.com:
+
+1. Create a PostgreSQL service in Render and note the connection string
+2. Create a Web Service using the root Dockerfile
+3. Set the following environment variables in Render:
+   - `DATABASE_URL` (from Render PostgreSQL service)
+   - `RAILS_ENV=production`
+   - `RAILS_MASTER_KEY` (generate with `rails credentials:edit`)
+   - `CORS_ORIGIN` (your frontend URL)
+
+The application will automatically run migrations on startup. Seeds are only run in development.
+
 ## Notes
 
 The seed strategy is optimized for 10,000 employees using batched `insert_all` writes instead of row-by-row inserts.

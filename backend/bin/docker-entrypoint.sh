@@ -1,13 +1,16 @@
 #!/bin/bash
 set -e
 
-# Wait for database to be ready
-until PGPASSWORD=$DATABASE_PASSWORD psql -h "$DATABASE_HOST" -U "$DATABASE_USER" -d "postgres" -c '\q'; do
-  echo "PostgreSQL is unavailable - sleeping"
-  sleep 1
-done
-
-echo "PostgreSQL is up - executing command"
+# Wait for database to be ready if using individual env vars (Docker Compose)
+if [ -z "$DATABASE_URL" ]; then
+  until PGPASSWORD=$DATABASE_PASSWORD psql -h "$DATABASE_HOST" -U "$DATABASE_USER" -d "postgres" -c '\q'; do
+    echo "PostgreSQL is unavailable - sleeping"
+    sleep 1
+  done
+  echo "PostgreSQL is up - executing command"
+else
+  echo "Using DATABASE_URL for database connection"
+fi
 
 # Run migrations
 echo "Running database migrations..."

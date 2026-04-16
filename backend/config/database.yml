@@ -15,5 +15,8 @@ test:
   database: <%= ENV.fetch("DATABASE_NAME_TEST", "salary_test") %>
 
 production:
+  # Use DATABASE_URL for cloud deployments (Render, Heroku, etc.)
+  url: <%= ENV["DATABASE_URL"] %>
+  # Fallback to individual env vars for local production setup
   <<: *default
   database: <%= ENV.fetch("DATABASE_NAME", "salary_prod") %>

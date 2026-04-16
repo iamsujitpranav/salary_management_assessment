@@ -10,7 +10,6 @@ COPY backend/Gemfile backend/Gemfile.lock* ./
 RUN bundle install
 
 COPY backend/ ./
-
 COPY backend/bin/docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
