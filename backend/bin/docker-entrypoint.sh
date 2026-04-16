@@ -1,15 +1,6 @@
 #!/bin/bash
 set -e
 
-# Debug: Print environment variables
-echo "=== DEBUG INFO ==="
-echo "RAILS_ENV: $RAILS_ENV"
-echo "DATABASE_URL: ${DATABASE_URL:-NOT_SET}"
-echo "DATABASE_HOST: ${DATABASE_HOST:-NOT_SET}"
-echo "DATABASE_USER: ${DATABASE_USER:-NOT_SET}"
-echo "DATABASE_NAME: ${DATABASE_NAME:-NOT_SET}"
-echo "=================="
-
 # Skip database wait check for production deployments (Render, Heroku, etc.)
 # Cloud databases are ready before containers start, so no wait check needed
 if [ "$RAILS_ENV" = "development" ]; then
