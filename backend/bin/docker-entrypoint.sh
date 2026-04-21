@@ -9,6 +9,7 @@ echo "DATABASE_HOST: ${DATABASE_HOST:-NOT_SET}"
 echo "DATABASE_USER: ${DATABASE_USER:-NOT_SET}"
 echo "DATABASE_NAME: ${DATABASE_NAME:-NOT_SET}"
 echo "DATABASE_PASSWORD set: ${DATABASE_PASSWORD:+yes}${DATABASE_PASSWORD:-no}"
+echo "VITE_API_URL: ${VITE_API_URL:-NOT_SET}"
 echo "Resolved production database.yml:"
 bundle exec ruby -e 'require "erb"; require "yaml"; require "pp"; config = YAML.safe_load(ERB.new(File.read("config/database.yml")).result, aliases: true); pp config["production"]' || true
 echo "===================="

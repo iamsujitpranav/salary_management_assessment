@@ -1,0 +1,16 @@
+# Render blueprint for the frontend static site deployment.
+# Keep the Rails backend service on a separate Render service such as salary-management-assessment-backend.
+services:
+  - type: web
+    name: salary-management-assessment
+    runtime: static
+    rootDir: frontend
+    buildCommand: echo "VITE_API_URL=${VITE_API_URL:-NOT_SET}" && npm ci && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: https://salary-management-assessment-backend.onrender.com
