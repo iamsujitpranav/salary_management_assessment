@@ -17,4 +17,6 @@ test:
 production:
   # Use DATABASE_URL for cloud deployments (Render, Heroku, etc.)
   # Rails will use DATABASE_URL if set, otherwise fall back to individual env vars
+  <<: *default
   url: <%= ENV["DATABASE_URL"] %>
+  database: <%= ENV.fetch("DATABASE_NAME", "salary_prod") %>
