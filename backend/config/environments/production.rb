@@ -7,4 +7,6 @@ Rails.application.configure do
   config.action_controller.perform_caching = true
   config.active_support.report_deprecations = false
   config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
+  config.require_master_key = true
+  config.secret_key_base = Rails.application.credentials.secret_key_base
 end

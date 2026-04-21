@@ -51,7 +51,7 @@ For production deployment on Render.com:
 3. Set the following environment variables in Render:
    - `DATABASE_URL` (from Render PostgreSQL service)
    - `RAILS_ENV=production`
-   - `RAILS_MASTER_KEY` (generate with `rails credentials:edit`)
+   - `RAILS_MASTER_KEY` (used to decrypt `backend/config/credentials.yml.enc`, which now stores `secret_key_base`)
    - `CORS_ORIGIN` (your frontend URL)
 
 The application will automatically run migrations on startup. Seeds are only run in development.
