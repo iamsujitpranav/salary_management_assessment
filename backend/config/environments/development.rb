@@ -8,4 +8,5 @@ Rails.application.configure do
   config.action_controller.perform_caching = false
   config.active_record.migration_error = :page_load
   config.active_record.verbose_query_logs = true
+  config.active_storage.service = :local
 end
