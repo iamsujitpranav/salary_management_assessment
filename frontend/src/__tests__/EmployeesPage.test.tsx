@@ -49,7 +49,7 @@ describe('EmployeesPage', () => {
           top_country: null,
           employment_type_breakdown: {},
         },
-        countries: [],
+        countries: [{ country: 'Singapore', headcount: 1, average_salary: 0, minimum_salary: 0, maximum_salary: 0 }],
         job_titles: [],
       },
     });
@@ -63,6 +63,7 @@ describe('EmployeesPage', () => {
     fireEvent.change(screen.getByPlaceholderText(/Job title/i), { target: { value: 'Designer' } });
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'Singapore' } });
 
-    expect(useEmployeesMock).toHaveBeenCalledWith({ q: 'maya', job_title: 'Designer', country: 'Singapore', per_page: 10000 });
+    const lastCall = useEmployeesMock.mock.calls[useEmployeesMock.mock.calls.length - 1];
+    expect(lastCall[0]).toEqual({ q: 'maya', job_title: 'Designer', country: 'Singapore', per_page: 10000 });
   });
 });

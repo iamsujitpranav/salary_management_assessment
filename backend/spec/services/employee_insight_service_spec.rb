@@ -4,17 +4,18 @@ RSpec.describe EmployeeInsightService do
   before do
     SalaryHistory.delete_all
     Employee.delete_all
-    create(:employee, country: "India", job_title: "Senior Engineer", salary: 100_000)
-    create(:employee, country: "India", job_title: "HR Manager", salary: 80_000)
-    create(:employee, country: "United States", job_title: "Product Manager", salary: 140_000)
+    create(:employee, country: "India", job_title: "Senior Engineer", salary: 100_000, status: "active")
+    create(:employee, country: "India", job_title: "HR Manager", salary: 80_000, status: "active")
+    create(:employee, country: "United States", job_title: "Product Manager", salary: 140_000, status: "on_leave")
+    create(:employee, country: "United States", job_title: "Engineer", salary: 120_000, status: "inactive")
   end
 
   describe ".overview" do
     it "returns headcount and salary metrics" do
       overview = described_class.overview
 
-      expect(overview[:headcount]).to eq(3)
-      expect(overview[:average_salary]).to eq(106_666.67)
+      expect(overview[:headcount]).to eq(4)
+      expect(overview[:average_salary]).to eq(110_000.0)
       expect(overview[:minimum_salary]).to eq(80_000.0)
       expect(overview[:maximum_salary]).to eq(140_000.0)
       expect(overview[:top_country]).to eq("India")
@@ -30,6 +31,36 @@ RSpec.describe EmployeeInsightService do
       expect(overview[:top_country]).to eq("India")
       expect(overview[:employment_type_breakdown]).to be_a(Hash)
     end
+
+    it "filters overview metrics by status" do
+      overview = described_class.overview(status: "active")
+
+      expect(overview[:headcount]).to eq(2)
+      expect(overview[:average_salary]).to eq(90_000.0)
+      expect(overview[:minimum_salary]).to eq(80_000.0)
+      expect(overview[:maximum_salary]).to eq(100_000.0)
+      expect(overview[:top_country]).to eq("India")
+    end
+
+    it "filters overview metrics by country and status" do
+      overview = described_class.overview(country: "United States", status: "on_leave")
+
+      expect(overview[:headcount]).to eq(1)
+      expect(overview[:average_salary]).to eq(140_000.0)
+      expect(overview[:minimum_salary]).to eq(140_000.0)
+      expect(overview[:maximum_salary]).to eq(140_000.0)
+      expect(overview[:top_country]).to eq("United States")
+    end
+
+    it "returns empty metrics when status matches no employees" do
+      overview = described_class.overview(status: "terminated")
+
+      expect(overview[:headcount]).to eq(0)
+      expect(overview[:average_salary]).to eq(0.0)
+      expect(overview[:minimum_salary]).to eq(0.0)
+      expect(overview[:maximum_salary]).to eq(0.0)
+      expect(overview[:top_country]).to be_nil
+    end
   end
 
   describe ".by_country" do
@@ -39,6 +70,7 @@ RSpec.describe EmployeeInsightService do
       expect(countries.map { |row| [row[:country], row[:job_title]] }).to contain_exactly(
         ["India", "HR Manager"],
         ["India", "Senior Engineer"],
+        ["United States", "Engineer"],
         ["United States", "Product Manager"]
       )
     end
@@ -61,6 +93,21 @@ RSpec.describe EmployeeInsightService do
       countries = described_class.by_country(job_title: "Architect")
 
       expect(countries).to be_empty
+    end
+
+    it "filters by status" do
+      countries = described_class.by_country(status: "active")
+
+      expect(countries.size).to eq(2)
+      expect(countries.map { |row| row[:country] }).to all(eq("India"))
+    end
+
+    it "filters by status and job title" do
+      countries = described_class.by_country(status: "active", job_title: "Senior Engineer")
+
+      expect(countries.size).to eq(1)
+      expect(countries.first[:country]).to eq("India")
+      expect(countries.first[:job_title]).to eq("Senior Engineer")
     end
   end
 
@@ -86,6 +133,23 @@ RSpec.describe EmployeeInsightService do
       expect(titles).to be_empty
     end
 
+    it "filters by status" do
+      titles = described_class.by_job_title(status: "active")
+
+      expect(titles.size).to eq(2)
+      expect(titles.map { |row| row[:country] }).to all(eq("India"))
+    end
+
+    it "filters by status and country" do
+      titles = described_class.by_job_title(country: "United States", status: "on_leave")
+
+      expect(titles.size).to eq(1)
+      expect(titles.first[:job_title]).to eq("Product Manager")
+      expect(titles.first[:country]).to eq("United States")
+    end
+  end
+
+  describe ".overview" do
     it "returns an empty overview when there are no employees" do
       SalaryHistory.delete_all
       Employee.delete_all

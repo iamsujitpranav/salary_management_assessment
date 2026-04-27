@@ -1,10 +1,11 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { useEmployeeStore } from '../stores/useEmployeeStore';
 import { useCreateEmployee, useDeleteEmployee, useEmployees, useInsights, useUpdateEmployee } from '../hooks/useEmployees';
 import { EmployeeTable } from '../components/employees/EmployeeTable';
 import { EmployeeForm } from '../components/employees/EmployeeForm';
 import { APP_PATHS, employeeDetailPath, navigateTo } from '../lib/navigation';
-import type { EmployeeFormValues, InsightsResponse } from '../api/types';
+import { getCountryOptions } from '../lib/countryOptions';
+import type { EmployeeFormValues } from '../api/types';
 
 const SHOW_ALL_EMPLOYEES_PER_PAGE = 10000;
 
@@ -25,10 +26,7 @@ export function EmployeesPage() {
     }
   }, [openForm]);
 
-  const countryOptions = useMemo<string[]>(() => {
-    const countries = (insightsQuery.data?.countries ?? []) as InsightsResponse['countries'];
-    return Array.from(new Set(countries.map(({ country }: InsightsResponse['countries'][number]) => country))).sort();
-  }, [insightsQuery.data?.countries]);
+  const countryOptions = getCountryOptions(insightsQuery.data?.countries);
 
   const handleSubmit = async (values: EmployeeFormValues) => {
     if (selectedEmployee) {

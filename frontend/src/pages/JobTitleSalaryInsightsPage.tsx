@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useCountryInsights, useJobTitleInsights } from '../hooks/useEmployees';
-import type { CountryInsight } from '../api/types';
+import { getCountryOptions } from '../lib/countryOptions';
 
 export function JobTitleSalaryInsightsPage() {
   const [country, setCountry] = useState('');
@@ -9,10 +9,7 @@ export function JobTitleSalaryInsightsPage() {
   const allCountriesQuery = useCountryInsights();
   const titleMetricsQuery = useJobTitleInsights({ country: country || undefined, job_title: jobTitle || undefined });
 
-  const countryOptions = useMemo<string[]>(() => {
-    const countries = (allCountriesQuery.data?.countries ?? []) as CountryInsight[];
-    return Array.from(new Set(countries.map(({ country: optionCountry }) => optionCountry))).sort();
-  }, [allCountriesQuery.data?.countries]);
+  const countryOptions = useMemo(() => getCountryOptions(allCountriesQuery.data?.countries), [allCountriesQuery.data?.countries]);
 
   const rows = titleMetricsQuery.data?.job_titles ?? [];
   const visibleRows = useMemo(() => {

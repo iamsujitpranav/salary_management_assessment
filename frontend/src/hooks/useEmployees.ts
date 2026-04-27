@@ -37,28 +37,28 @@ export function useEmployee(id: number) {
 
 export function useInsights(filters: InsightFilters = {}) {
   return useQuery({
-    queryKey: ['insights', filters.country ?? 'all', filters.job_title ?? 'all'],
+    queryKey: ['insights', filters.country ?? 'all', filters.job_title ?? 'all', filters.status ?? 'all'],
     queryFn: () => fetchInsights(filters),
   });
 }
 
-export function useInsightsOverview(filters: Pick<InsightFilters, 'country'> = {}) {
+export function useInsightsOverview(filters: Pick<InsightFilters, 'country' | 'status'> = {}) {
   return useQuery({
-    queryKey: ['insights-overview', filters.country ?? 'all'],
+    queryKey: ['insights-overview', filters.country ?? 'all', filters.status ?? 'all'],
     queryFn: () => fetchInsightsOverview(filters),
   });
 }
 
-export function useCountryInsights(filters: Pick<InsightFilters, 'country' | 'job_title'> = {}) {
+export function useCountryInsights(filters: Pick<InsightFilters, 'country' | 'job_title' | 'status'> = {}) {
   return useQuery({
-    queryKey: ['insights-country', filters.country ?? 'all', filters.job_title ?? 'all'],
+    queryKey: ['insights-country', filters.country ?? 'all', filters.job_title ?? 'all', filters.status ?? 'all'],
     queryFn: () => fetchCountryInsights(filters),
   });
 }
 
 export function useJobTitleInsights(filters: InsightFilters = {}) {
   return useQuery({
-    queryKey: ['insights-job-title', filters.country ?? 'all', filters.job_title ?? 'all'],
+    queryKey: ['insights-job-title', filters.country ?? 'all', filters.job_title ?? 'all', filters.status ?? 'all'],
     queryFn: () => fetchJobTitleInsights(filters),
   });
 }

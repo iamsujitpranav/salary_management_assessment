@@ -46,15 +46,17 @@ The database is automatically created and seeded when the backend container star
 
 For production deployment on Render.com, deploy the backend and frontend as separate services:
 
+- Live application: https://salary-management-assessment.onrender.com
+
 1. Create a PostgreSQL service in Render and note the connection string
-2. Rename or create the Rails backend Web Service as `salary-management-assessment-api` so the frontend can use the default `salary-management-assessment.onrender.com` URL
+2. Rename or create the Rails backend Web Service as your API service so the frontend can point at it cleanly
 3. Set the following backend environment variables in Render:
    - `DATABASE_URL` (from Render PostgreSQL service)
    - `RAILS_ENV=production`
    - `RAILS_MASTER_KEY` (used to decrypt `backend/config/credentials.yml.enc`, which now stores `secret_key_base`)
-   - `CORS_ORIGIN=https://salary-management-assessment.onrender.com`
-4. Create the frontend as a separate Render static site using `render.yaml`; it will claim the default `salary-management-assessment.onrender.com` URL
-5. Set the frontend build variable `VITE_API_URL` to the backend API URL (`https://salary-management-assessment-api.onrender.com`)
+   - `CORS_ORIGIN` set to your frontend Render URL
+4. Create the frontend as a separate Render static site using `render.yaml`; it will claim the default Render URL
+5. Set the frontend build variable `VITE_API_URL` to your backend API service URL
 
 The backend will automatically run migrations on startup. Seeds are only run in development.
 

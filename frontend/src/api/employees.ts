@@ -12,6 +12,7 @@ import type {
 export type InsightFilters = {
   country?: string;
   job_title?: string;
+  status?: string;
 };
 
 export async function fetchEmployees(params: Record<string, string | number | undefined>) {
@@ -25,13 +26,13 @@ export async function fetchEmployee(id: number) {
 }
 
 export async function fetchInsights(filters: InsightFilters = {}) {
-  const { country, job_title } = filters;
+  const { country, job_title, status } = filters;
   const countryParams = country ? { country } : undefined;
-  const titleParams = country || job_title ? { ...(country ? { country } : {}), ...(job_title ? { job_title } : {}) } : undefined;
+  const titleParams = country || job_title || status ? { ...(country ? { country } : {}), ...(job_title ? { job_title } : {}), ...(status ? { status } : {}) } : undefined;
 
   const [overviewResponse, countriesResponse, jobTitlesResponse] = await Promise.all([
-    api.get('/api/v1/insights/overview', { params: countryParams }),
-    api.get('/api/v1/insights/by_country', { params: countryParams }),
+    api.get('/api/v1/insights/overview', { params: country || status ? { ...(country ? { country } : {}), ...(status ? { status } : {}) } : undefined }),
+    api.get('/api/v1/insights/by_country', { params: titleParams }),
     api.get('/api/v1/insights/by_job_title', { params: titleParams }),
   ]);
 
@@ -42,28 +43,28 @@ export async function fetchInsights(filters: InsightFilters = {}) {
   } satisfies InsightsResponse;
 }
 
-export async function fetchInsightsOverview(filters: Pick<InsightFilters, 'country'> = {}) {
-  const { country } = filters;
+export async function fetchInsightsOverview(filters: Pick<InsightFilters, 'country' | 'status'> = {}) {
+  const { country, status } = filters;
   const { data } = await api.get<InsightsOverviewResponse>('/api/v1/insights/overview', {
-    params: country ? { country } : undefined,
+    params: country || status ? { ...(country ? { country } : {}), ...(status ? { status } : {}) } : undefined,
   });
 
   return data;
 }
 
-export async function fetchCountryInsights(filters: Pick<InsightFilters, 'country' | 'job_title'> = {}) {
-  const { country, job_title } = filters;
+export async function fetchCountryInsights(filters: Pick<InsightFilters, 'country' | 'job_title' | 'status'> = {}) {
+  const { country, job_title, status } = filters;
   const { data } = await api.get<CountryInsightsResponse>('/api/v1/insights/by_country', {
-    params: country || job_title ? { ...(country ? { country } : {}), ...(job_title ? { job_title } : {}) } : undefined,
+    params: country || job_title || status ? { ...(country ? { country } : {}), ...(job_title ? { job_title } : {}), ...(status ? { status } : {}) } : undefined,
   });
 
   return data;
 }
 
 export async function fetchJobTitleInsights(filters: InsightFilters = {}) {
-  const { country, job_title } = filters;
+  const { country, job_title, status } = filters;
   const { data } = await api.get<JobTitleInsightsResponse>('/api/v1/insights/by_job_title', {
-    params: country || job_title ? { ...(country ? { country } : {}), ...(job_title ? { job_title } : {}) } : undefined,
+    params: country || job_title || status ? { ...(country ? { country } : {}), ...(job_title ? { job_title } : {}), ...(status ? { status } : {}) } : undefined,
   });
 
   return data;

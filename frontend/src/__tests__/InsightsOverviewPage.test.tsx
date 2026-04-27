@@ -56,10 +56,57 @@ describe('InsightsOverviewPage', () => {
     expect(screen.getByText('Headcount')).toBeTruthy();
     expect(screen.getAllByText('3').length).toBeGreaterThan(0);
 
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'India' } });
+    const countrySelect = screen.getAllByRole('combobox')[0];
+    fireEvent.change(countrySelect, { target: { value: 'India' } });
 
     expect(screen.getByText(/Showing metrics for India/i)).toBeTruthy();
     expect(screen.getAllByText('2').length).toBeGreaterThan(0);
+  });
+
+  it('renders status filter and filters by status', () => {
+    useCountryInsightsMock.mockReturnValue({
+      data: {
+        countries: [],
+      },
+    });
+    useInsightsOverviewMock.mockImplementation((filters = {}) => {
+      if (filters.status === 'active') {
+        return {
+          data: {
+            overview: {
+              headcount: 2,
+              average_salary: 90000,
+              minimum_salary: 80000,
+              maximum_salary: 100000,
+              top_country: 'India',
+              employment_type_breakdown: { full_time: 2 },
+            },
+          },
+        };
+      }
+
+      return {
+        data: {
+          overview: {
+            headcount: 3,
+            average_salary: 106666.67,
+            minimum_salary: 80000,
+            maximum_salary: 140000,
+            top_country: 'India',
+            employment_type_breakdown: { full_time: 3 },
+          },
+        },
+      };
+    });
+
+    render(<InsightsOverviewPage />);
+
+    expect(screen.getByText('All statuses')).toBeTruthy();
+
+    const statusSelect = screen.getAllByRole('combobox')[1];
+    fireEvent.change(statusSelect, { target: { value: 'active' } });
+
+    expect(screen.getByText(/Showing metrics for active/i)).toBeTruthy();
   });
 
   it('shows an empty state when there are no employment type metrics', () => {

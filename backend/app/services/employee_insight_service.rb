@@ -1,19 +1,20 @@
 class EmployeeInsightService
-  def self.overview(country: nil)
-    new(country:).overview
+  def self.overview(country: nil, status: nil)
+    new(country:, status:).overview
   end
 
-  def self.by_country(country: nil, job_title: nil)
-    new(country:, job_title:).by_country
+  def self.by_country(country: nil, job_title: nil, status: nil)
+    new(country:, job_title:, status:).by_country
   end
 
-  def self.by_job_title(country: nil, job_title: nil)
-    new(country:, job_title:).by_job_title
+  def self.by_job_title(country: nil, job_title: nil, status: nil)
+    new(country:, job_title:, status:).by_job_title
   end
 
-  def initialize(country: nil, job_title: nil)
+  def initialize(country: nil, job_title: nil, status: nil)
     @country = country
     @job_title = job_title
+    @status = status
   end
 
   def overview
@@ -76,11 +77,12 @@ class EmployeeInsightService
 
   private
 
-  attr_reader :country, :job_title
+  attr_reader :country, :job_title, :status
 
   def filtered_scope
     scope = Employee.all
     scope = scope.in_country(country)
+    scope = scope.with_status(status)
     scope
   end
 

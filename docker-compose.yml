@@ -18,6 +18,8 @@ services:
       DATABASE_HOST: db
       DATABASE_NAME: salary_dev
       DATABASE_NAME_TEST: salary_test
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: password
       RAILS_ENV: development
       CORS_ORIGIN: http://localhost:4173
     ports:

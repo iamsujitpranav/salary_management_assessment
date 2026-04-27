@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useCountryInsights } from '../hooks/useEmployees';
-import type { CountryInsight } from '../api/types';
+import { getCountryOptions } from '../lib/countryOptions';
 
 export function CountrySalaryInsightsPage() {
   const [country, setCountry] = useState('');
@@ -11,10 +11,7 @@ export function CountrySalaryInsightsPage() {
     ...(jobTitle ? { job_title: jobTitle } : {}),
   });
 
-  const countryOptions = useMemo<string[]>(() => {
-    const countries = (allCountriesQuery.data?.countries ?? []) as CountryInsight[];
-    return Array.from(new Set(countries.map(({ country: optionCountry }) => optionCountry))).sort();
-  }, [allCountriesQuery.data?.countries]);
+  const countryOptions = useMemo(() => getCountryOptions(allCountriesQuery.data?.countries), [allCountriesQuery.data?.countries]);
 
   const rows = countryMetricsQuery.data?.countries ?? [];
   const summary = useMemo(() => {
