@@ -262,21 +262,21 @@ class OpenApiDocumentBuilder
 
   def insight_overview_operation
     operation("Salary overview", { "$ref": "#/components/schemas/InsightOverviewResponse" }).merge(
-      parameters: [country_parameter],
+      parameters: [country_parameter, status_parameter],
       responses: success_response("InsightOverviewResponse")
     )
   end
 
   def insight_country_operation
     operation("Salary by country", { "$ref": "#/components/schemas/CountryInsightsResponse" }).merge(
-      parameters: [country_parameter],
+      parameters: [country_parameter, job_title_parameter, status_parameter],
       responses: success_response("CountryInsightsResponse")
     )
   end
 
   def insight_job_title_operation
     operation("Salary by job title", { "$ref": "#/components/schemas/JobTitleInsightsResponse" }).merge(
-      parameters: [country_parameter, job_title_parameter],
+      parameters: [country_parameter, job_title_parameter, status_parameter],
       responses: success_response("JobTitleInsightsResponse")
     )
   end
@@ -302,6 +302,10 @@ class OpenApiDocumentBuilder
 
   def job_title_parameter
     { name: "job_title", in: :query, required: false, schema: { type: :string } }
+  end
+
+  def status_parameter
+    { name: "status", in: :query, required: false, schema: { type: :string }, description: "Filter by employee status (active, on_leave, inactive, terminated)" }
   end
 
   def request_body(schema_name)
