@@ -12,6 +12,16 @@ class Employee < ApplicationRecord
   validates :salary, numericality: { greater_than_or_equal_to: 0 }
   validates :status, inclusion: { in: STATUSES }
   validates :employment_type, inclusion: { in: EMPLOYMENT_TYPES }
+  validate :hired_on_must_be_valid_date
+
+  # Ensure hired_on is not in the future since employees cannot be hired before they start.
+  def hired_on_must_be_valid_date
+    return if hired_on.blank?
+
+    if hired_on > Date.today
+      errors.add(:hired_on, "must be on or before today")
+    end
+  end
 
   # Partial text search matches name, title, and department substrings for predictable root-page filtering.
   # Each term is ANDed across the concatenated roster fields using case-insensitive LIKE.

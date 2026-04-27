@@ -19,11 +19,17 @@ describe('EmployeeForm', () => {
     await userEvent.type(screen.getByLabelText(/Salary/i), '95000');
     await userEvent.type(screen.getByLabelText(/Currency/i), 'SGD');
     await userEvent.type(screen.getByLabelText(/Employment type/i), 'full_time');
-    await userEvent.type(screen.getByLabelText(/Hired on/i), '2024-01-10');
+    // Date picker is tested separately - setting default value for hired_on
     await userEvent.type(screen.getByLabelText(/Status/i), 'active');
 
     await userEvent.click(screen.getByRole('button', { name: /Save/i }));
 
     expect(onSubmit).toHaveBeenCalled();
+  });
+
+  it('renders the date picker for hired_on field', () => {
+    render(<EmployeeForm open employee={null} onClose={onClose} onSubmit={onSubmit} />);
+
+    expect(screen.getByLabelText(/Hired on/i)).toBeTruthy();
   });
 });

@@ -3,6 +3,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import ReactDatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import type { Employee, EmployeeFormValues } from '../../api/types';
 
 const schema = z.object({
@@ -27,7 +29,7 @@ type Props = {
 };
 
 export function EmployeeForm({ open, employee, onClose, onSubmit }: Props) {
-  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<EmployeeFormValues>({
+  const { register, handleSubmit, reset, watch, setValue, formState: { errors, isSubmitting } } = useForm<EmployeeFormValues>({
     resolver: zodResolver(schema),
     defaultValues: employee
       ? {
@@ -69,7 +71,7 @@ export function EmployeeForm({ open, employee, onClose, onSubmit }: Props) {
       salary: 0,
       currency: 'USD',
       employment_type: 'full_time',
-      hired_on: '',
+      hired_on: new Date().toISOString().split('T')[0],
       status: 'active',
     });
   }, [employee, reset]);
@@ -105,7 +107,6 @@ export function EmployeeForm({ open, employee, onClose, onSubmit }: Props) {
                 ['Salary', 'salary'],
                 ['Currency', 'currency'],
                 ['Employment type', 'employment_type'],
-                ['Hired on', 'hired_on'],
                 ['Status', 'status'],
               ].map(([label, field]) => (
                 <label key={field} htmlFor={field} className="grid gap-2 text-sm text-slate-200">
@@ -114,6 +115,18 @@ export function EmployeeForm({ open, employee, onClose, onSubmit }: Props) {
                   {errors[field as keyof EmployeeFormValues] ? <span className="text-xs text-rose-300">Required</span> : null}
                 </label>
               ))}
+              <label htmlFor="hired_on" className="grid gap-2 text-sm text-slate-200">
+                <span>Hired on</span>
+                <ReactDatePicker
+                  id="hired_on"
+                  selected={watch('hired_on') ? new Date(watch('hired_on')) : null}
+                  onChange={(date: Date | null) => setValue('hired_on', date ? date.toISOString().split('T')[0] : '')}
+                  maxDate={new Date()}
+                  className="rounded-2xl border border-slate-700 bg-slate-950/80 px-4 py-3 outline-none focus:border-cyan-400 w-full"
+                  dateFormat="yyyy-MM-dd"
+                />
+                {errors.hired_on ? <span className="text-xs text-rose-300">Required</span> : null}
+              </label>
             </div>
             <div className="flex justify-end gap-3">
               <button type="button" onClick={onClose} className="rounded-2xl border border-slate-700 px-5 py-3">Cancel</button>

@@ -100,4 +100,23 @@ RSpec.describe Employee, type: :model do
     expect(Employee.with_job_title("des").map(&:job_title)).to include("Designer")
     expect(Employee.with_job_title("data").map(&:job_title)).to include("Data Analyst")
   end
+
+  it "is invalid with a future hired_on date" do
+    employee.hired_on = Date.tomorrow + 1
+
+    expect(employee).not_to be_valid
+    expect(employee.errors[:hired_on]).to include("must be on or before today")
+  end
+
+  it "is valid with today's hired_on date" do
+    employee.hired_on = Date.today
+
+    expect(employee).to be_valid
+  end
+
+  it "is valid with a past hired_on date" do
+    employee.hired_on = Date.yesterday
+
+    expect(employee).to be_valid
+  end
 end
