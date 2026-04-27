@@ -54,6 +54,27 @@ RSpec.describe "Api::V1::Employees", type: :request do
       expect(response).to have_http_status(:unprocessable_entity)
       expect(JSON.parse(response.body)["errors"]).not_to be_empty
     end
+
+    it "returns validation error when hired_on is in the future" do
+      post "/api/v1/employees", params: {
+        employee: {
+          first_name: "Maya",
+          last_name: "Chen",
+          job_title: "Designer",
+          department: "Design",
+          country: "Singapore",
+          email: "maya.chen@example.com",
+          salary: 95_000,
+          currency: "SGD",
+          employment_type: "full_time",
+          hired_on: Date.tomorrow + 1,
+          status: "active"
+        }
+      }
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(JSON.parse(response.body)["errors"]).to include("Hired on must be on or before today")
+    end
   end
 
   describe "PATCH /api/v1/employees/:id" do

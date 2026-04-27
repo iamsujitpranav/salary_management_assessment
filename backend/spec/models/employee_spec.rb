@@ -119,4 +119,11 @@ RSpec.describe Employee, type: :model do
 
     expect(employee).to be_valid
   end
+
+  it "does not add error when hired_on is blank (handled by presence validation)" do
+    employee.hired_on = nil
+
+    expect(employee).not_to be_valid
+    expect(employee.errors[:hired_on]).to include("can't be blank")
+  end
 end
