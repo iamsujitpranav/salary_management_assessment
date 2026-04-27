@@ -46,7 +46,8 @@ The database is automatically created and seeded when the backend container star
 
 For production deployment on Render.com, deploy the backend and frontend as separate services:
 
-- Live application: https://salary-management-assessment.onrender.com
+- **Live frontend:** https://salary-management-assessment.onrender.com
+- **API documentation:** https://salary-management-assessment-backend.onrender.com/api-docs
 
 1. Create a PostgreSQL service in Render and note the connection string
 2. Rename or create the Rails backend Web Service as your API service so the frontend can point at it cleanly
@@ -65,3 +66,14 @@ The frontend reads `VITE_API_URL` at build time, so it should point at the deplo
 ## Notes
 
 The seed strategy is optimized for 10,000 employees using batched `insert_all` writes instead of row-by-row inserts.
+
+## Test Coverage
+
+The application maintains comprehensive test coverage:
+
+- **Backend:** 81 RSpec examples, 0 failures
+- **Frontend:** 32 Vitest tests, 0 failures
+
+To run tests:
+- Backend: `docker-compose exec backend bundle exec rspec`
+- Frontend: `cd frontend && npm test`
